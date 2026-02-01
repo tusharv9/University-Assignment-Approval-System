@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+
+enum ProgramType {
+  UG
+  PG
+  RESEARCH
+}
+
+model Department {
+  id        Int         @id @default(autoincrement())
+  name      String      @unique
+  type      ProgramType
+  address   String
+  createdAt DateTime    @default(now())
+  users     User[]
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+  PROFESSOR
+  HOD
+}
+
+model User {
+  id              Int            @id @default(autoincrement())
+  name            String
+  email           String         @unique
+  phone           String
+  role            String
+  password        String
+  departmentId    Int?
+  department      Department?    @relation(fields: [departmentId], references: [id])
+  assignments     Assignment[]
+  reviewedAssignments Assignment[] @relation("AssignmentReviewer")
+  notifications   Notification[]
+  assignmentHistory AssignmentHistory[]
+  createdAt       DateTime       @default(now())
+}
+
+enum AssignmentStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+  PENDING
+}
+
+enum AssignmentCategory {
+  ASSIGNMENT
+  THESIS
+  REPORT
+}
+
+model Assignment {
+  id          Int               @id @default(autoincrement())
+  title       String
+  description String?
+  category    AssignmentCategory @default(ASSIGNMENT)
+  filePath    String?
+  status      AssignmentStatus  @default(DRAFT)
+  studentId   Int
+  student     User              @relation(fields: [studentId], references: [id])
+  reviewerId  Int?
+  reviewer    User?             @relation("AssignmentReviewer", fields: [reviewerId], references: [id])
+  submittedAt DateTime?
+  history     AssignmentHistory[]
+  createdAt   DateTime          @default(now())
+}
+
+model Notification {
+  id          Int      @id @default(autoincrement())
+  message     String
+  type        String   @default("ASSIGNMENT_SUBMITTED")
+  read        Boolean  @default(false)
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  assignmentId Int?
+  createdAt   DateTime @default(now())
+}
+
+model AssignmentHistory {
+  id          Int      @id @default(autoincrement())
+  assignmentId Int
+  assignment  Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  reviewerId  Int
+  reviewer    User     @relation(fields: [reviewerId], references: [id])
+  action      String   // SUBMITTED, APPROVED, REJECTED, PENDING, RETURNED
+  remark      String?
+  signature   String?  // Could be reviewer name or digital signature
+  createdAt   DateTime @default(now())
+}
