@@ -8,6 +8,7 @@ const prisma_1 = __importDefault(require("./prisma"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const admin_1 = __importDefault(require("./routes/admin"));
 const student_1 = __importDefault(require("./routes/student"));
+const professor_1 = __importDefault(require("./routes/professor"));
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 3000;
 app.use(express_1.default.json());
@@ -24,6 +25,10 @@ app.use((req, res, next) => {
 app.use('/auth', auth_1.default);
 app.use('/admin', admin_1.default);
 app.use('/student', student_1.default);
+app.use('/professor', professor_1.default);
+// Serve uploaded files
+const path_1 = __importDefault(require("path"));
+app.use('/uploads', express_1.default.static(path_1.default.join(process.cwd(), 'uploads')));
 app.get('/', (req, res) => {
     res.json({
         message: 'Welcome to the University Assignment Approval Platform API',

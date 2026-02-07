@@ -3,6 +3,7 @@ import prisma from './prisma';
 import authRoutes from './routes/auth';
 import adminRoutes from './routes/admin';
 import studentRoutes from './routes/student';
+import professorRoutes from './routes/professor';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,6 +24,7 @@ app.use((req, res, next) => {
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
 app.use('/student', studentRoutes);
+app.use('/professor', professorRoutes);
 
 // Serve uploaded files
 import path from 'path';

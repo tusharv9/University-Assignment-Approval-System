@@ -7,7 +7,6 @@ const express_1 = require("express");
 const prisma_1 = __importDefault(require("../prisma"));
 const auth_1 = require("../middleware/auth");
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const client_1 = require("@prisma/client");
 const router = (0, express_1.Router)();
 router.post('/departments/create', auth_1.authenticateToken, async (req, res) => {
     try {
@@ -672,7 +671,7 @@ router.delete('/users/:id', auth_1.authenticateToken, async (req, res) => {
             const pendingAssignments = await prisma_1.default.assignment.count({
                 where: {
                     studentId: id,
-                    status: client_1.AssignmentStatus.PENDING
+                    status: 'PENDING'
                 }
             });
             if (pendingAssignments > 0) {

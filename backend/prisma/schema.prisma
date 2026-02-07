@@ -58,6 +58,7 @@ enum AssignmentStatus {
   APPROVED
   REJECTED
   PENDING
+  FORWARDED
 }
 
 enum AssignmentCategory {

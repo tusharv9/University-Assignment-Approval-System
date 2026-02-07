@@ -1,6 +1,12 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import ProtectedRoute from '../components/ProtectedRoute';
+
+function defaultDashboardPath(role: string | undefined): string {
+  if (role === 'ADMIN') return '/dashboard';
+  if (role === 'PROFESSOR') return '/professor/dashboard';
+  return '/student/dashboard';
+}
 import AppLayout from '../components/layout/AppLayout';
 import LoginPage from '../pages/Login';
 import DashboardPage from '../pages/Dashboard';
@@ -15,9 +21,11 @@ import UploadAssignmentPage from '../pages/student/UploadAssignment';
 import BulkUploadAssignmentPage from '../pages/student/BulkUploadAssignment';
 import MyAssignmentsPage from '../pages/student/MyAssignments';
 import AssignmentDetailsPage from '../pages/student/AssignmentDetails';
+import ProfessorDashboardPage from '../pages/professor/ProfessorDashboard';
+import ReviewAssignmentPage from '../pages/professor/ReviewAssignment';
 
 function AppRoutes() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   return (
     <Routes>
@@ -25,13 +33,15 @@ function AppRoutes() {
 
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
-          <Route index element={<DashboardPage />} />
+          <Route index element={<Navigate to={defaultDashboardPath(user?.role)} replace />} />
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="student/dashboard" element={<StudentDashboardPage />} />
           <Route path="student/assignments/upload" element={<UploadAssignmentPage />} />
           <Route path="student/assignments/bulk-upload" element={<BulkUploadAssignmentPage />} />
           <Route path="student/assignments/:id" element={<AssignmentDetailsPage />} />
           <Route path="student/assignments" element={<MyAssignmentsPage />} />
+          <Route path="professor/dashboard" element={<ProfessorDashboardPage />} />
+          <Route path="professor/assignments/:id/review" element={<ReviewAssignmentPage />} />
           <Route path="departments">
             <Route index element={<DepartmentsListPage />} />
             <Route path="create" element={<CreateDepartmentPage />} />
@@ -47,7 +57,12 @@ function AppRoutes() {
 
       <Route
         path="*"
-        element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />}
+        element={
+          <Navigate
+            to={isAuthenticated ? defaultDashboardPath(user?.role) : '/login'}
+            replace
+          />
+        }
       />
     </Routes>
   );

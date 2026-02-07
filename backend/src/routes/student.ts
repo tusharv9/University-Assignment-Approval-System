@@ -277,7 +277,7 @@ router.get(
   requireRole('STUDENT', 'PROFESSOR', 'HOD'),
   async (req: AuthRequest, res: Response) => {
     try {
-      const studentId = req.user!.id;
+      const userId = req.user!.id;
       const assignmentId = parseInt(req.params.id, 10);
 
       if (isNaN(assignmentId)) {
@@ -287,11 +287,14 @@ router.get(
         });
       }
 
-      // Get assignment and verify it belongs to the student
+      // Allow access if user is the student or the reviewer (professor)
       const assignment = await prisma.assignment.findFirst({
         where: {
           id: assignmentId,
-          studentId
+          OR: [
+            { studentId: userId },
+            { reviewerId: userId }
+          ]
         },
         select: {
           id: true,
@@ -401,7 +404,7 @@ router.get(
   requireRole('STUDENT', 'PROFESSOR', 'HOD'),
   async (req: AuthRequest, res: Response) => {
     try {
-      const studentId = req.user!.id;
+      const userId = req.user!.id;
       const assignmentId = parseInt(req.params.id, 10);
 
       if (isNaN(assignmentId)) {
@@ -411,11 +414,14 @@ router.get(
         });
       }
 
-      // Get assignment and verify it belongs to the student
+      // Allow download if user is the student or the reviewer (professor)
       const assignment = await prisma.assignment.findFirst({
         where: {
           id: assignmentId,
-          studentId
+          OR: [
+            { studentId: userId },
+            { reviewerId: userId }
+          ]
         },
         select: {
           id: true,

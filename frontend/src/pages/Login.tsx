@@ -49,7 +49,12 @@ const LoginPage = () => {
       const { token, user } = response.data;
       setAuthToken(token);
       login(token, user);
-      const fallback = user.role === 'ADMIN' ? '/dashboard' : '/student/dashboard';
+      const fallback =
+        user.role === 'ADMIN'
+          ? '/dashboard'
+          : user.role === 'PROFESSOR'
+            ? '/professor/dashboard'
+            : '/student/dashboard';
       const redirectTo =
         (location.state as { from?: Location })?.from?.pathname ?? fallback;
       navigate(redirectTo, { replace: true });

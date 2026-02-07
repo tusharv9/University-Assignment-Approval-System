@@ -104,6 +104,165 @@ export async function fetchStudentDashboard() {
   return response.data;
 }
 
+// Professor dashboard
+export interface ProfessorDashboardAssignment {
+  id: number;
+  title: string;
+  studentName: string;
+  studentEmail: string;
+  submittedAt: string | null;
+  daysPending: number;
+}
+
+export interface ProfessorDashboardResponse {
+  success: boolean;
+  message: string;
+  data: {
+    pendingCount: number;
+    assignments: ProfessorDashboardAssignment[];
+  };
+}
+
+export async function fetchProfessorDashboard() {
+  const response = await api.get<ProfessorDashboardResponse>('/professor/dashboard');
+  return response.data;
+}
+
+export interface ProfessorNotification {
+  id: number;
+  message: string;
+  type: string;
+  read: boolean;
+  assignmentId: number | null;
+  createdAt: string;
+}
+
+export interface ProfessorNotificationsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    notifications: ProfessorNotification[];
+  };
+}
+
+export async function fetchProfessorNotifications() {
+  const response = await api.get<ProfessorNotificationsResponse>('/professor/notifications');
+  return response.data;
+}
+
+export async function markProfessorNotificationRead(notificationId: number) {
+  const response = await api.patch(`/professor/notifications/${notificationId}/read`);
+  return response.data as { success: boolean; message: string };
+}
+
+// Professor review & approve
+export interface ProfessorReviewAssignment {
+  id: number;
+  title: string;
+  description: string | null;
+  category: string;
+  status: string;
+  statusLabel: string;
+  statusColor: string;
+  filePath: string | null;
+  createdAt: string;
+  submittedAt: string | null;
+  student: { id: number; name: string; email: string };
+  reviewer: { id: number; name: string; email: string; role: string } | null;
+  history: Array<{
+    id: number;
+    action: string;
+    remark: string | null;
+    signature: string;
+    createdAt: string;
+    reviewer: { id: number; name: string; email: string; role: string };
+  }>;
+}
+
+export interface ProfessorReviewResponse {
+  success: boolean;
+  message: string;
+  data: { assignment: ProfessorReviewAssignment };
+}
+
+export async function fetchProfessorReviewAssignment(assignmentId: number) {
+  const response = await api.get<ProfessorReviewResponse>(
+    `/professor/assignments/${assignmentId}/review`
+  );
+  return response.data;
+}
+
+export async function requestApproveOtp(
+  assignmentId: number,
+  payload: { remarks?: string; signature?: string }
+) {
+  const response = await api.post<{ success: boolean; message: string }>(
+    `/professor/assignments/${assignmentId}/approve/request-otp`,
+    payload
+  );
+  return response.data;
+}
+
+export async function verifyApprove(
+  assignmentId: number,
+  payload: { otp: string; remarks?: string; signature?: string }
+) {
+  const response = await api.post<{ success: boolean; message: string }>(
+    `/professor/assignments/${assignmentId}/approve/verify`,
+    payload
+  );
+  return response.data;
+}
+
+export async function rejectProfessorAssignment(
+  assignmentId: number,
+  payload: { remark: string }
+) {
+  const response = await api.post<{ success: boolean; message: string }>(
+    `/professor/assignments/${assignmentId}/reject`,
+    payload
+  );
+  return response.data;
+}
+
+// Forward assignment to another professor/HOD
+export interface ForwardRecipient {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+}
+
+export interface ForwardRecipientsResponse {
+  success: boolean;
+  message: string;
+  data: { recipients: ForwardRecipient[] };
+}
+
+export async function fetchForwardRecipients() {
+  const response = await api.get<ForwardRecipientsResponse>('/professor/forward-recipients');
+  return response.data;
+}
+
+export async function forwardProfessorAssignment(
+  assignmentId: number,
+  payload: { newReviewerId: number; note?: string }
+) {
+  const response = await api.post<{ success: boolean; message: string }>(
+    `/professor/assignments/${assignmentId}/forward`,
+    payload
+  );
+  return response.data;
+}
+
+/** Fetch assignment file as blob for preview/download (uses auth) */
+export async function fetchAssignmentFileBlob(assignmentId: number): Promise<Blob> {
+  const response = await api.get(`/student/assignments/${assignmentId}/download`, {
+    responseType: 'blob'
+  });
+  return response.data as Blob;
+}
+
 export interface Assignment {
   id: number;
   title: string;

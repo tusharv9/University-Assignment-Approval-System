@@ -7,8 +7,9 @@ const links = [
   { to: '/departments/create', label: 'Create Department', roles: ['ADMIN'] },
   { to: '/users', label: 'Users', roles: ['ADMIN'] },
   { to: '/users/create', label: 'Create User', roles: ['ADMIN'] },
-  { to: '/student/dashboard', label: 'Student Dashboard', roles: ['STUDENT', 'PROFESSOR', 'HOD'] },
-  { to: '/student/assignments/upload', label: 'Upload Assignment', roles: ['STUDENT', 'PROFESSOR', 'HOD'] }
+  { to: '/professor/dashboard', label: 'Pending Reviews', roles: ['PROFESSOR', 'HOD'] },
+  { to: '/student/dashboard', label: 'Student Dashboard', roles: ['STUDENT', 'HOD'] },
+  { to: '/student/assignments/upload', label: 'Upload Assignment', roles: ['STUDENT', 'HOD'] }
 ];
 
 const AppLayout = () => {
