@@ -13,7 +13,7 @@ const programTypeLabels: Record<string, string> = {
 const DepartmentsListPage = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
-  const [type, setType] = useState<string>('');
+  const [type, setType] = useState<'' | 'UG' | 'PG' | 'RESEARCH'>('');
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -77,7 +77,8 @@ const DepartmentsListPage = () => {
   };
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setType(event.target.value);
+    const v = event.target.value;
+    setType(v === 'UG' || v === 'PG' || v === 'RESEARCH' ? v : '');
     setPage(1);
   };
 

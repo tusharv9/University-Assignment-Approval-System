@@ -250,7 +250,8 @@ router.get('/assignments', auth_1.authenticateToken, (0, auth_1.requireRole)('ST
 router.get('/assignments/:id', auth_1.authenticateToken, (0, auth_1.requireRole)('STUDENT', 'PROFESSOR', 'HOD'), async (req, res) => {
     try {
         const userId = req.user.id;
-        const assignmentId = parseInt(req.params.id, 10);
+        const idParam = req.params.id;
+        const assignmentId = typeof idParam === 'string' ? parseInt(idParam, 10) : NaN;
         if (isNaN(assignmentId)) {
             return res.status(400).json({
                 success: false,
@@ -367,7 +368,8 @@ router.get('/assignments/:id', auth_1.authenticateToken, (0, auth_1.requireRole)
 router.get('/assignments/:id/download', auth_1.authenticateToken, (0, auth_1.requireRole)('STUDENT', 'PROFESSOR', 'HOD'), async (req, res) => {
     try {
         const userId = req.user.id;
-        const assignmentId = parseInt(req.params.id, 10);
+        const idParam = req.params.id;
+        const assignmentId = typeof idParam === 'string' ? parseInt(idParam, 10) : NaN;
         if (isNaN(assignmentId)) {
             return res.status(400).json({
                 success: false,
@@ -487,7 +489,8 @@ router.get('/professors', auth_1.authenticateToken, (0, auth_1.requireRole)('STU
 router.post('/assignments/:id/submit', auth_1.authenticateToken, (0, auth_1.requireRole)('STUDENT', 'PROFESSOR', 'HOD'), async (req, res) => {
     try {
         const studentId = req.user.id;
-        const assignmentId = parseInt(req.params.id, 10);
+        const idParam = req.params.id;
+        const assignmentId = typeof idParam === 'string' ? parseInt(idParam, 10) : NaN;
         const { reviewerId } = req.body;
         if (isNaN(assignmentId)) {
             return res.status(400).json({
@@ -635,7 +638,7 @@ router.post('/assignments/:id/submit', auth_1.authenticateToken, (0, auth_1.requ
     }
 });
 // POST /student/assignments/upload - Upload new assignment with file
-router.post('/assignments/upload', auth_1.authenticateToken, (0, auth_1.requireRole)('STUDENT', 'PROFESSOR', 'HOD'), upload_1.uploadAssignment.single('file'), upload_1.handleUploadError, async (req, res) => {
+router.post('/assignments/upload', auth_1.authenticateToken, (0, auth_1.requireRole)('STUDENT', 'PROFESSOR'), upload_1.uploadAssignment.single('file'), upload_1.handleUploadError, async (req, res) => {
     try {
         const studentId = req.user.id;
         const { title, description, category } = req.body;
@@ -730,7 +733,8 @@ router.post('/assignments/upload', auth_1.authenticateToken, (0, auth_1.requireR
 router.post('/assignments/:id/resubmit', auth_1.authenticateToken, (0, auth_1.requireRole)('STUDENT', 'PROFESSOR', 'HOD'), upload_1.uploadAssignment.single('file'), upload_1.handleUploadError, async (req, res) => {
     try {
         const studentId = req.user.id;
-        const assignmentId = parseInt(req.params.id, 10);
+        const idParam = req.params.id;
+        const assignmentId = typeof idParam === 'string' ? parseInt(idParam, 10) : NaN;
         const { description } = req.body;
         const file = req.file;
         if (isNaN(assignmentId)) {
@@ -921,7 +925,7 @@ router.post('/assignments/:id/resubmit', auth_1.authenticateToken, (0, auth_1.re
     }
 });
 // POST /student/assignments/bulk-upload - Upload multiple assignments at once
-router.post('/assignments/bulk-upload', auth_1.authenticateToken, (0, auth_1.requireRole)('STUDENT', 'PROFESSOR', 'HOD'), upload_1.uploadAssignmentArray.array('files', 5), upload_1.handleUploadError, async (req, res) => {
+router.post('/assignments/bulk-upload', auth_1.authenticateToken, (0, auth_1.requireRole)('STUDENT', 'PROFESSOR'), upload_1.uploadAssignmentArray.array('files', 5), upload_1.handleUploadError, async (req, res) => {
     try {
         const studentId = req.user.id;
         const { description, category } = req.body;
@@ -991,6 +995,8 @@ router.post('/assignments/bulk-upload', auth_1.authenticateToken, (0, auth_1.req
         const uploadedFiles = [];
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
+            if (!file)
+                continue;
             try {
                 // Use original filename as title (without extension)
                 const title = file.originalname.replace(/\.[^/.]+$/, '') || `Assignment ${i + 1}`;

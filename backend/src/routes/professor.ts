@@ -350,8 +350,8 @@ router.post(
       otpStore.set(key, {
         otp,
         expiresAt: Date.now() + OTP_EXPIRY_MS,
-        remarks: remarks || undefined,
-        signature: signature || undefined
+        ...(remarks ? { remarks } : {}),
+        ...(signature ? { signature } : {})
       });
 
       const sent = await sendOtpEmail(professorEmail, otp);

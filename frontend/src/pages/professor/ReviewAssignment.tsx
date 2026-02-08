@@ -49,16 +49,21 @@ const ReviewAssignmentPage = () => {
     let objectUrl: string | null = null;
 
     const load = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        setLoading(true);
-        setError(null);
         const res = await fetchProfessorReviewAssignment(assignmentId);
         setAssignment(res.data.assignment);
 
         if (res.data.assignment.filePath) {
-          const blob = await fetchAssignmentFileBlob(assignmentId);
-          objectUrl = URL.createObjectURL(blob);
-          setPdfUrl(objectUrl);
+          try {
+            const blob = await fetchAssignmentFileBlob(assignmentId);
+            objectUrl = URL.createObjectURL(blob);
+            setPdfUrl(objectUrl);
+          } catch (fileErr) {
+            // Don't fail the whole page if file is missing/unavailable
+            console.warn('Could not load assignment file:', fileErr);
+          }
         }
       } catch (err) {
         const msg =

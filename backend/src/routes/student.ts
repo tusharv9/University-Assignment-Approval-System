@@ -278,7 +278,8 @@ router.get(
   async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.user!.id;
-      const assignmentId = parseInt(req.params.id, 10);
+      const idParam = req.params.id;
+      const assignmentId = typeof idParam === 'string' ? parseInt(idParam, 10) : NaN;
 
       if (isNaN(assignmentId)) {
         return res.status(400).json({
@@ -405,7 +406,8 @@ router.get(
   async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.user!.id;
-      const assignmentId = parseInt(req.params.id, 10);
+      const idParam = req.params.id;
+      const assignmentId = typeof idParam === 'string' ? parseInt(idParam, 10) : NaN;
 
       if (isNaN(assignmentId)) {
         return res.status(400).json({
@@ -546,7 +548,8 @@ router.post(
   async (req: AuthRequest, res: Response) => {
     try {
       const studentId = req.user!.id;
-      const assignmentId = parseInt(req.params.id, 10);
+      const idParam = req.params.id;
+      const assignmentId = typeof idParam === 'string' ? parseInt(idParam, 10) : NaN;
       const { reviewerId } = req.body as { reviewerId?: number };
 
       if (isNaN(assignmentId)) {
@@ -709,7 +712,7 @@ router.post(
 router.post(
   '/assignments/upload',
   authenticateToken,
-  requireRole('STUDENT', 'PROFESSOR', 'HOD'),
+  requireRole('STUDENT', 'PROFESSOR'),
   uploadAssignment.single('file'),
   handleUploadError,
   async (req: AuthRequest, res: Response) => {
@@ -826,7 +829,8 @@ router.post(
   async (req: AuthRequest, res: Response) => {
     try {
       const studentId = req.user!.id;
-      const assignmentId = parseInt(req.params.id, 10);
+      const idParam = req.params.id;
+      const assignmentId = typeof idParam === 'string' ? parseInt(idParam, 10) : NaN;
       const { description } = req.body as { description?: string };
       const file = (req as any).file;
 
@@ -1031,7 +1035,7 @@ router.post(
 router.post(
   '/assignments/bulk-upload',
   authenticateToken,
-  requireRole('STUDENT', 'PROFESSOR', 'HOD'),
+  requireRole('STUDENT', 'PROFESSOR'),
   uploadAssignmentArray.array('files', 5),
   handleUploadError,
   async (req: AuthRequest, res: Response) => {
@@ -1111,6 +1115,7 @@ router.post(
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
+        if (!file) continue;
         try {
           // Use original filename as title (without extension)
           const title = file.originalname.replace(/\.[^/.]+$/, '') || `Assignment ${i + 1}`;
